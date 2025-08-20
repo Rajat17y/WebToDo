@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+</head>
+<body>
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+          <h1 class="title has-text-centered">Login</h1>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% for field in form %}
+              <div class="field">
+                <label class="label">{{ field.label }}</label>
+                <div class="control">
+                  {{ field|add_class:"input" }}
+                </div>
+                {% if field.errors %}
+                  <p class="help is-danger">{{ field.errors|striptags }}</p>
+                {% endif %}
+              </div>
+            {% endfor %}
+            
+            <div class="field">
+              <button type="submit" class="button is-primary is-fullwidth">Log In</button>
+            </div>
+
+          </form>
+
+          <p class="has-text-centered">
+            Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Optional: Template filter to add CSS class to fields -->
+  {% comment %}
+  You can add this filter in a custom template tags file if required:
+
+  @register.filter(name='add_class')
+  def add_class(field, css_class):
+      return field.as_widget(attrs={"class": css_class})
+  {% endcomment %}
+
+</body>
+</html>
