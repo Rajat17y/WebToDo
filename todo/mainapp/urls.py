@@ -10,4 +10,6 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('todo/', views.todo_page_view, name='todolist'),
     path('todo/delete/<int:pk>/', views.delete_task, name='delete_task'),
+    #Fixed: removed double slash
+    path('todo/update-order/', views.update_task_order, name='update_task_order'),  # New URL for ordering
 ]
