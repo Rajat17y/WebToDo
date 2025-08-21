@@ -1,0 +1,454 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar - TaskMaster</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3273dc;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            background: #3273dc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background: #2759aa;
+        }
+        
+        .calendar-grid {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: #3273dc;
+            color: white;
+        }
+        
+        .weekday {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        
+        .calendar-day {
+            min-height: 120px;
+            border: 1px solid #e0e0e0;
+            padding: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+        
+        .calendar-day:hover {
+            background-color: #f8f9ff;
+        }
+        
+        .calendar-day.other-month {
+            background-color: #f9f9f9;
+            color: #ccc;
+        }
+        
+        .calendar-day.today {
+            background-color: #e3f2fd;
+            border: 2px solid #3273dc;
+        }
+        
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .day-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-height: 80px;
+            overflow: hidden;
+        }
+        
+        .task-item {
+            background: #e8f4fd;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 12px;
+            border-left: 3px solid #3273dc;
+            cursor: pointer;
+        }
+        
+        .task-item.high {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        
+        .task-item.medium {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+        
+        .task-item.low {
+            border-left-color: #28a745;
+            background: #f8fff9;
+        }
+        
+        .task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        
+        .more-tasks {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            margin-top: 2px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            background: #3273dc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2759aa;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            margin-right: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .task-list {
+            margin-top: 20px;
+        }
+        
+        .task-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #3273dc;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            color: #2759aa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'todolist' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Todo List
+        </a>
+        
+        <div class="calendar-header">
+            <h1 class="calendar-title">{{ month_name }} {{ year }}</h1>
+            <div class="calendar-nav">
+                <a href="?year={{ prev_year }}&month={{ prev_month }}" class="nav-btn">
+                    <i class="fas fa-chevron-left"></i>
+                    Previous
+                </a>
+                <a href="?year={{ today.year }}&month={{ today.month }}" class="nav-btn">
+                    Today
+                </a>
+                <a href="?year={{ next_year }}&month={{ next_month }}" class="nav-btn">
+                    Next
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="calendar-grid">
+            <div class="calendar-weekdays">
+                {% for weekday in weekdays %}
+                    <div class="weekday">{{ weekday }}</div>
+                {% endfor %}
+            </div>
+            
+            <div class="calendar-days">
+                {% for week in month_days %}
+                    {% for day in week %}
+                        {% if day == 0 %}
+                            <div class="calendar-day other-month"></div>
+                        {% else %}
+                            {% with date_str=year|add:"-"|add:month|stringformat:"02d"|add:"-"|add:day|stringformat:"02d" %}
+                                <div class="calendar-day{% if date_str == today|date:'Y-m-d' %} today{% endif %}" 
+                                     data-date="{{ date_str }}" onclick="openDayModal('{{ date_str }}')">
+                                    <div class="day-number">{{ day }}</div>
+                                    <div class="day-tasks">
+                                        {% for task in tasks_by_date|default_if_none:"" %}
+                                            {% if forloop.counter0|add:1 <= 3 %}
+                                                <div class="task-item {{ task.priority }}{% if task.completed %} completed{% endif %}">
+                                                    {{ task.task|truncatechars:15 }}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% with task_count=tasks_by_date|length %}
+                                            {% if task_count > 3 %}
+                                                <div class="more-tasks">+{{ task_count|add:"-3" }} more</div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            {% endwith %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Day Modal -->
+    <div id="dayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalDate"></h2>
+                <span class="close" onclick="closeDayModal()">&times;</span>
+            </div>
+            
+            <form id="addTaskForm" onsubmit="addTask(event)">
+                <div class="form-group">
+                    <label for="taskInput">New Task</label>
+                    <input type="text" id="taskInput" class="form-control" placeholder="Enter task..." required>
+                </div>
+                <div class="form-group">
+                    <label for="prioritySelect">Priority</label>
+                    <select id="prioritySelect" class="form-control">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="closeDayModal()">Cancel</button>
+                <button type="submit" class="btn">Add Task</button>
+            </form>
+            
+            <div id="taskList" class="task-list">
+                <!-- Tasks will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedDate = '';
+        
+        function openDayModal(date) {
+            selectedDate = date;
+            const modal = document.getElementById('dayModal');
+            const modalDate = document.getElementById('modalDate');
+            
+            // Format date for display
+            const dateObj = new Date(date + 'T00:00:00');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            modalDate.textContent = dateObj.toLocaleDateString(undefined, options);
+            
+            // Load tasks for this date
+            loadTasksForDate(date);
+            
+            modal.style.display = 'block';
+        }
+        
+        function closeDayModal() {
+            document.getElementById('dayModal').style.display = 'none';
+            document.getElementById('addTaskForm').reset();
+        }
+        
+        function loadTasksForDate(date) {
+            fetch(`/get-tasks-for-date/?date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    const taskList = document.getElementById('taskList');
+                    taskList.innerHTML = '';
+                    
+                    if (data.tasks.length > 0) {
+                        data.tasks.forEach(task => {
+                            const taskItem = document.createElement('div');
+                            taskItem.className = 'task-list-item';
+                            taskItem.innerHTML = `
+                                <span class="${task.completed ? 'completed' : ''}">${task.task}</span>
+                                <span class="priority-badge ${task.priority}">${task.priority}</span>
+                            `;
+                            taskList.appendChild(taskItem);
+                        });
+                    } else {
+                        taskList.innerHTML = '<p>No tasks for this date.</p>';
+                    }
+                });
+        }
+        
+        function addTask(event) {
+            event.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('task', document.getElementById('taskInput').value);
+            formData.append('due_date', selectedDate);
+            formData.append('priority', document.getElementById('prioritySelect').value);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            
+            fetch('/add-task-to-date/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Reload to show new task
+                } else {
+                    alert('Error adding task');
+                }
+            });
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('dayModal');
+            if (event.target == modal) {
+                closeDayModal();
+            }
+        }
+    </script>
+</body>
+</html>

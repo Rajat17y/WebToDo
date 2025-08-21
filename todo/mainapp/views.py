@@ -3,6 +3,10 @@ from django.contrib.auth import login
 from .forms import SignUpForm
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from .models import Tasks
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from .forms import ToDoForm
 
 
 def landing_page(request):
@@ -10,7 +14,40 @@ def landing_page(request):
 
 @login_required #This shit redirects to the home page but only works if your are logined
 def home(request):
-    return HttpResponse("Welcome to the home page!")
+    context = {'username': request.user.get_full_name() or request.user.username}
+    return render(request,'mainapp/dashboard.html',context)
+
+
+
+@login_required
+def delete_task(request, pk):
+    if request.method == "POST":
+        task = get_object_or_404(Tasks, id=pk, user=request.user)
+        task.delete()
+    return redirect('todolist')  # change to your correct view name
+    
+@login_required
+def todo_page_view(request):
+    user = request.user
+    todos = Tasks.objects.filter(user=user).order_by('order_field')  # OR relevant order
+    
+    if request.method == 'POST':
+        form = ToDoForm(request.POST)
+        if form.is_valid():
+            todo = form.save(commit=False)
+            todo.user = user
+            todo.save()
+            return redirect('todolist')
+    else:
+        form = ToDoForm()
+
+    context = {
+        'todos': todos,
+        'form': form,
+        'username': user.get_full_name() or user.username,
+    }
+    return render(request, 'mainapp/todolist.html', context)
+
 
 def signup(request):
     if request.method == 'POST':

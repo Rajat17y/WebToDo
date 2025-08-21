@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - Calendar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="calender.css">
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/plugin/isSameOrBefore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/plugin/isSameOrAfter.js"></script>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="app-title">TaskMaster</h1>
+        </div>
+        <div class="nav-right">
+            <div class="profile-dropdown">
+                <button class="profile-btn" id="profileBtn" aria-label="Profile menu">
+                    <img src="https://via.placeholder.com/40x40/007bff/fff?text=JD" alt="Profile" class="profile-avatar">
+                    <span class="profile-name">John Doe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-menu" id="profileDropdown">
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <hr class="dropdown-divider">
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>HomePage</span>
+            </a>
+            <a href="calendar.html" class="nav-item active">
+                <i class="fas fa-calendar"></i>
+                <span>Calendar</span>
+            </a>
+            <a href="today.html" class="nav-item">
+                <i class="fas fa-clock"></i>
+                <span>Today's Task</span>
+            </a>
+            <a href="lists.html" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Lists</span>
+            </a>
+            <a href="goals.html" class="nav-item">
+                <i class="fas fa-bullseye"></i>
+                <span>Goals</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Calendar Header -->
+            <section class="calendar-header">
+                <h2>Calendar</h2>
+                <p>Manage your tasks with our dual calendar system</p>
+            </section>
+
+            <!-- Calendar Tabs -->
+            <section class="calendar-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="dayjs">Day.js Calendar</button>
+                    <button class="tab-btn" data-tab="custom">Custom Calendar</button>
+                </div>
+            </section>
+
+            <!-- Day.js Calendar -->
+            <section class="calendar-section" id="dayjsCalendar">
+                <div class="card">
+                    <div class="card__header">
+                        <div class="calendar-controls">
+                            <button class="btn btn--outline" id="dayjsPrevMonth">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h3 class="calendar-title" id="dayjsCalendarTitle">August 2025</h3>
+                            <button class="btn btn--outline" id="dayjsNextMonth">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn--primary" id="dayjsTodayBtn">Today</button>
+                    </div>
+                    <div class="card__body">
+                        <div class="calendar-grid">
+                            <div class="calendar-weekdays">
+                                <div class="weekday">Sun</div>
+                                <div class="weekday">Mon</div>
+                                <div class="weekday">Tue</div>
+                                <div class="weekday">Wed</div>
+                                <div class="weekday">Thu</div>
+                                <div class="weekday">Fri</div>
+                                <div class="weekday">Sat</div>
+                            </div>
+                            <div class="calendar-days" id="dayjsCalendarDays">
+                                <!-- Days will be generated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Custom Calendar -->
+            <section class="calendar-section hidden" id="customCalendar">
+                <div class="card">
+                    <div class="card__header">
+                        <div class="calendar-controls">
+                            <button class="btn btn--outline" id="customPrevMonth">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h3 class="calendar-title" id="customCalendarTitle">August 2025</h3>
+                            <button class="btn btn--outline" id="customNextMonth">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn--primary" id="customTodayBtn">Today</button>
+                    </div>
+                    <div class="card__body">
+                        <div class="calendar-grid">
+                            <div class="calendar-weekdays">
+                                <div class="weekday">Sun</div>
+                                <div class="weekday">Mon</div>
+                                <div class="weekday">Tue</div>
+                                <div class="weekday">Wed</div>
+                                <div class="weekday">Thu</div>
+                                <div class="weekday">Fri</div>
+                                <div class="weekday">Sat</div>
+                            </div>
+                            <div class="calendar-days" id="customCalendarDays">
+                                <!-- Days will be generated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Add Task -->
+            <section class="quick-add-task">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Quick Add Task</h3>
+                        <form class="task-form" id="quickTaskForm">
+                            <div class="form-group">
+                                <div class="task-input-container">
+                                    <input type="text" class="form-control task-input" id="quickTaskInput" placeholder="Enter a new task..." required>
+                                    <input type="date" class="form-control date-input" id="taskDateInput" required>
+                                    <select class="form-control priority-select" id="quickPrioritySelect">
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                    <button type="submit" class="btn btn--primary">
+                                        <i class="fas fa-plus"></i>
+                                        Add Task
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Task Details Modal -->
+    <div class="modal hidden" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="taskModalTitle">Tasks for Date</h3>
+                <button class="modal-close" id="taskModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-date-info" id="modalDateInfo">
+                    <!-- Date info will be inserted here -->
+                </div>
+                
+                <!-- Add Task Form -->
+                <div class="add-task-form">
+                    <h4>Add New Task</h4>
+                    <form id="modalTaskForm">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="modalTaskInput" placeholder="Enter task title..." required>
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" id="modalPrioritySelect">
+                                <option value="low">Low Priority</option>
+                                <option value="medium" selected>Medium Priority</option>
+                                <option value="high">High Priority</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--full-width">Add Task</button>
+                    </form>
+                </div>
+
+                <!-- Existing Tasks -->
+                <div class="modal-tasks-section">
+                    <h4>Existing Tasks</h4>
+                    <div class="modal-task-list" id="modalTaskList">
+                        <!-- Tasks for the selected date will be shown here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Edit Modal -->
+    <div class="modal hidden" id="editTaskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Task</h3>
+                <button class="modal-close" id="editModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editTaskForm">
+                    <div class="form-group">
+                        <label class="form-label">Task Title</label>
+                        <input type="text" class="form-control" id="editTaskInput" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="editTaskDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <select class="form-control" id="editTaskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn--outline" id="cancelEditTask">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="calender.css"></script>
+</body>
+</html>

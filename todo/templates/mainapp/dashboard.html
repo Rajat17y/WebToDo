@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard with Sidebar To-Do</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #dashboard-container {
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    #navbar {
+      background-color: #3273dc;
+      color: white;
+      padding: 1rem 2rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(50, 50, 93, 0.2);
+    }
+
+    /* Main content area below navbar */
+    #main-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar with To-Do input and list */
+    #sidebar {
+      width: 280px;
+      background-color: #f5f7fa;
+      border-right: 1px solid #ddd;
+      padding: 1rem;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Feature buttons area */
+    #features {
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    #features .button {
+      justify-content: flex-start;
+      font-weight: 600;
+      color: #3273dc;
+      border: 1px solid #3273dc;
+      background: white;
+      transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #features .button:hover {
+      background-color: #3273dc;
+      color: white;
+      box-shadow: 0 4px 8px rgba(50, 115, 220, 0.3);
+    }
+
+    /* To-Do container in sidebar */
+    #todo-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid #ddd;
+      padding-top: 1rem;
+    }
+
+    #todo-container h3 {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: #20282d;
+      margin-bottom: 0.75rem;
+    }
+
+    /* To-Do input form */
+    form#todo-form {
+      display: flex;
+      margin-bottom: 1rem;
+    }
+
+    form#todo-form input.input {
+      flex-grow: 1;
+      border-radius: 6px 0 0 6px;
+      font-size: 1rem;
+    }
+
+    form#todo-form button.button {
+      border-radius: 0 6px 6px 0;
+      font-weight: 600;
+      background-color: #3273dc;
+      color: white;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+    form#todo-form button.button:hover {
+      background-color: #2759aa;
+    }
+
+    /* To-Do list */
+    ul.todo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      overflow-y: auto;
+      flex-grow: 1;
+      max-height: 300px;
+    }
+
+    ul.todo-list li {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background-color: white;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      font-size: 0.95rem;
+      color: #20282d;
+      word-wrap: break-word;
+    }
+
+    #content-area {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      background-color: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="dashboard-container">
+    <div id="navbar">
+      Welcome, <strong>{{ username }}</strong>
+    </div>
+    <div id="main-content">
+      <aside id="sidebar" aria-label="Sidebar with features and to-do list">
+        <div id="features">
+          <button class="button" type="button">Dashboard</button>
+          <button class="button" type="button">Profile</button>
+          <button class="button" type="button">Settings</button>
+          <button class="button" type="button">Notifications</button>
+          <button class="button" type="button">Reports</button>
+          <a href="{% url 'todolist' %}" class="button">
+            My To-Do
+            </a>
+          <form method="post" action="{% url 'logout' %}" style="margin-top:auto;">
+            {% csrf_token %}
+            <button type="submit" class="button is-danger">Logout</button>
+          </form>
+        </div>
+      </aside>
+
+      <section id="content-area">
+        <h1 class="title">Dashboard Content</h1>
+        <p>Your main dashboard content goes here.</p>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

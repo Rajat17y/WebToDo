@@ -1,6 +1,207 @@
-<h2>Sign Up</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Sign Up</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+  />
+  <style>
+    body {
+      background-color: #e6f0f3;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 24px;
+    }
+
+    .signup-card {
+      background: #ffffff;
+      box-shadow: 0 20px 50px rgba(32, 40, 45, 0.07);
+      border-radius: 16px;
+      width: 440px;
+      padding: 3rem 3.5rem;
+      text-align: left;
+    }
+
+    .signup-card h2 {
+      font-weight: 700;
+      font-size: 2rem;
+      color: #20282d;
+      margin-bottom: 0.4rem;
+      text-align: center;
+    }
+
+    .signup-card .subtitle {
+      font-weight: 400;
+      color: #7a8a97;
+      font-size: 1rem;
+      margin-bottom: 2.2rem;
+      text-align: center;
+    }
+
+    /* Use Bulma horizontal form */
+    .field.is-horizontal {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .field-label {
+      flex-basis: 40%;
+      text-align: right;
+      padding-right: 1rem;
+    }
+    .field-label label {
+      font-weight: 600;
+      color: #20282d;
+      font-size: 1rem;
+    }
+
+    .field-body {
+      flex-grow: 1;
+    }
+
+    input.input {
+      border-radius: 8px;
+      border: 1.8px solid #d2dce6;
+      font-size: 1rem;
+      color: #20282d;
+      padding: 0.75rem 1rem;
+      width: 100%;
+      transition: border-color 0.3s ease;
+      box-shadow: none;
+      background-color: #fefefe;
+    }
+    input.input:focus {
+      border-color: #1a4ed8;
+      box-shadow: 0 0 10px rgba(26, 78, 216, 0.3);
+      background-color: #fff;
+      outline: none;
+    }
+
+    .button.is-primary {
+      background-color: #1a4ed8; /* deeper blue */
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      padding: 0.85rem;
+      width: 100%;
+      transition: background-color 0.3s ease;
+      margin-top: 2rem;
+    }
+    .button.is-primary:hover {
+      background-color: #153bad;
+    }
+
+    .help.is-danger {
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      color: #da3737;
+      text-align: left;
+    }
+
+    .login-prompt {
+      margin-top: 1.75rem;
+      font-weight: 600;
+      color: #7a8a97;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+    .login-prompt a {
+      color: #1a4ed8;
+      text-decoration: none;
+      margin-left: 0.3rem;
+      font-weight: 700;
+    }
+    .login-prompt a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-card">
+    <h2>Sign Up</h2>
+    <p class="subtitle">Create your account to get started</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label for="{{ form.username.id_for_label }}"> {{ form.username.label }}</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              {{ form.username }}
+            </div>
+            {% if form.username.errors %}
+              <p class="help is-danger">{{ form.username.errors|striptags }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label for="{{ form.email.id_for_label }}"> {{ form.email.label }}</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              {{ form.email }}
+            </div>
+            {% if form.email.errors %}
+              <p class="help is-danger">{{ form.email.errors|striptags }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label for="{{ form.password1.id_for_label }}"> {{ form.password1.label }}</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              {{ form.password1 }}
+            </div>
+            {% if form.password1.errors %}
+              <p class="help is-danger">{{ form.password1.errors|striptags }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label for="{{ form.password2.id_for_label }}"> {{ form.password2.label }}</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              {{ form.password2 }}
+            </div>
+            {% if form.password2.errors %}
+              <p class="help is-danger">{{ form.password2.errors|striptags }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="button is-primary">Sign Up</button>
+    </form>
+
+    <div class="login-prompt">
+      Already have an account?
+      <a href="{% url 'login' %}">Log in</a>
+    </div>
+  </div>
+</body>
+</html>

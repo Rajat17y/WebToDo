@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard - To-Do</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden; /* prevents double scrollbars */
+    }
+    #dashboard-container {
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+    }
+    #navbar {
+      background-color: #3273dc;
+      color: white;
+      padding: 1rem 2rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(50, 50, 93, 0.2);
+    }
+    #main-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    #sidebar {
+      width: 220px;
+      background-color: #f5f7fa;
+      border-right: 1px solid #ddd;
+      padding: 1.5rem 1rem;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    #sidebar .button {
+      justify-content: flex-start;
+      font-weight: 600;
+      color: #3273dc;
+      border: 1px solid #3273dc;
+      background: white;
+      width: 100%;
+      margin-bottom: 0.8rem;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    #sidebar .button:hover {
+      background-color: #3273dc;
+      color: white;
+      box-shadow: 0 4px 8px rgba(50, 115, 220, 0.3);
+    }
+    form#logout-form {
+      margin-top: auto;
+    }
+    #content-area {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      background-color: white;
+      margin-bottom: 70px; /* give space for fixed input */
+    }
+    /* To-Do styles */
+    ul.todo-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #dedede;
+      border-radius: 8px;
+      background-color: #fff;
+      margin-bottom: 1rem;
+    }
+    ul.todo-list li {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #eee;
+      font-size: 1rem;
+      color: #2a2a2a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    ul.todo-list li:last-child {
+      border-bottom: none;
+    }
+    .task-text {
+      flex-grow: 1;
+      margin-right: 1rem;
+      word-break: break-word;
+    }
+    button.order-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #3273dc;
+      font-weight: 600;
+      font-size: 0.9rem;
+      user-select: none;
+      margin-left: 6px;
+    }
+    button.order-btn:hover:not(:disabled) {
+      text-decoration: underline;
+      color: #2759aa;
+    }
+    button.order-btn:disabled {
+      color: #ccc;
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+    /* Fixed input container */
+    #input-area {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 800px;
+      background: #fff;
+      padding: 8px 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      display: flex;
+      gap: 10px;
+      box-sizing: border-box;
+      z-index: 20;
+    }
+    #task-input {
+      flex-grow: 1;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    #task-input:focus {
+      border-color: #3273dc;
+      box-shadow: 0 0 6px rgba(50, 115, 220, 0.3);
+    }
+    #add-btn {
+      background-color: #3273dc;
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #add-btn:disabled {
+      background-color: #a5b8d1;
+      cursor: not-allowed;
+    }
+    #add-btn:hover:enabled {
+      background-color: #2759aa;
+    }
+  </style>
+</head>
+<body>
+  <div id="dashboard-container">
+    <!-- Top Navbar -->
+    <div id="navbar">
+      Welcome, <strong>{{ username }}</strong>
+    </div>
+    
+    <div id="main-content">
+      <!-- Sidebar -->
+      <aside id="sidebar">
+        <button class="button is-active" type="button">
+          My To-Do
+        </button>
+        <button class="button" type="button">Profile</button>
+        <button class="button" type="button">Settings</button>
+        <form id="logout-form" method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="button is-danger">Logout</button>
+        </form>
+      </aside>
+
+
+      <!-- Main Content -->
+      <section id="content-area">
+        <h1 class="title">My To-Do List</h1>
+        <form id="todo-form" method="post" novalidate>
+          {% csrf_token %}
+          <ul class="todo-list" id="todo-list">
+            {% for todo in todos %}
+              <li data-id="{{ todo.id }}">
+                <span class="task-text">{{ todo.task }}</span>
+                <span>
+                  <form action="{% url 'delete_task' todo.id %}" method="POST" style="display: inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="button is-small is-danger" >
+                          Delete
+                      </button>
+                  </form>
+                <span>
+                  <button class="order-btn up-btn" type="button" title="Move Up">▲</button>
+                  <button class="order-btn down-btn" type="button" title="Move Down">▼</button>
+                  <input type="hidden" name="todo_ids" value="{{ todo.id }}" />
+                </span>
+              </li>
+            {% empty %}
+              <li>No tasks added yet.</li>
+            {% endfor %}
+          </ul>
+        </form>
+      </section>
+    </div>
+  </div>
+  <!-- Fixed input at bottom center -->
+  <form id="input-area" method="post" action="{% url 'todolist' %}">
+    {% csrf_token %}
+    <input
+      type="text"
+      id="task-input"
+      name="task"
+      placeholder="Add a new task..."
+      autocomplete="off"
+      required
+    />
+    <button id="add-btn" type="submit" disabled>Add</button>
+  </form>
+
+
+  <script>
+    // Enable add button only when input is not empty
+    const taskInput = document.getElementById('task-input');
+    const addBtn = document.getElementById('add-btn');
+
+
+    taskInput.addEventListener('input', () => {
+      addBtn.disabled = taskInput.value.trim() === '';
+    });
+
+
+    // Handle move up/down buttons
+    document.querySelectorAll('.up-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const li = button.closest('li');
+        const prev = li.previousElementSibling;
+        if (prev) {
+          li.parentNode.insertBefore(li, prev);
+        }
+      });
+    });
+
+
+    document.querySelectorAll('.down-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const li = button.closest('li');
+        const next = li.nextElementSibling;
+        if (next) {
+          li.parentNode.insertBefore(next, li);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

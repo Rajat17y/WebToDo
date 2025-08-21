@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - Goals</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="goals.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="app-title">TaskMaster</h1>
+        </div>
+        <div class="nav-right">
+            <div class="profile-dropdown">
+                <button class="profile-btn" id="profileBtn" aria-label="Profile menu">
+                    <img src="https://via.placeholder.com/40x40/007bff/fff?text=JD" alt="Profile" class="profile-avatar">
+                    <span class="profile-name">John Doe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-menu" id="profileDropdown">
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <hr class="dropdown-divider">
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>HomePage</span>
+            </a>
+            <a href="calendar.html" class="nav-item">
+                <i class="fas fa-calendar"></i>
+                <span>Calendar</span>
+            </a>
+            <a href="today.html" class="nav-item">
+                <i class="fas fa-clock"></i>
+                <span>Today's Task</span>
+            </a>
+            <a href="lists.html" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Lists</span>
+            </a>
+            <a href="goals.html" class="nav-item active">
+                <i class="fas fa-bullseye"></i>
+                <span>Goals</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Header Section -->
+            <section class="goals-header">
+                <h2>Goals</h2>
+                <p>Track your progress and achieve your objectives</p>
+            </section>
+
+            <!-- Goals Summary -->
+            <section class="goals-summary">
+                <div class="summary-card daily">
+                    <div class="summary-icon">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <div class="summary-content">
+                        <h3 id="dailyGoalsCount">0</h3>
+                        <p>Daily Goals</p>
+                    </div>
+                </div>
+                <div class="summary-card short-term">
+                    <div class="summary-icon">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="summary-content">
+                        <h3 id="shortTermGoalsCount">0</h3>
+                        <p>Short Term</p>
+                    </div>
+                </div>
+                <div class="summary-card long-term">
+                    <div class="summary-icon">
+                        <i class="fas fa-mountain"></i>
+                    </div>
+                    <div class="summary-content">
+                        <h3 id="longTermGoalsCount">0</h3>
+                        <p>Long Term</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Goal Categories Tabs -->
+            <section class="goals-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-category="daily">
+                        <i class="fas fa-sun"></i>
+                        Daily Goals
+                    </button>
+                    <button class="tab-btn" data-category="short_term">
+                        <i class="fas fa-calendar-week"></i>
+                        Short Term
+                    </button>
+                    <button class="tab-btn" data-category="long_term">
+                        <i class="fas fa-mountain"></i>
+                        Long Term
+                    </button>
+                </div>
+            </section>
+
+            <!-- Goal Category Sections -->
+            <section class="goals-content">
+                <!-- Daily Goals -->
+                <div class="goal-category active" id="daily-goals">
+                    <div class="category-header">
+                        <h3>Daily Goals</h3>
+                        <p>Goals to accomplish today</p>
+                        <button class="btn btn--primary add-goal-btn" data-category="daily">
+                            <i class="fas fa-plus"></i>
+                            Add Daily Goal
+                        </button>
+                    </div>
+                    <div class="goals-grid" id="dailyGoalsList">
+                        <!-- Daily goals will be rendered here -->
+                    </div>
+                    <div class="empty-state" id="dailyEmptyState">
+                        <i class="fas fa-sun"></i>
+                        <h4>No daily goals yet</h4>
+                        <p>Add your first daily goal to get started!</p>
+                    </div>
+                </div>
+
+                <!-- Short Term Goals -->
+                <div class="goal-category" id="short-term-goals">
+                    <div class="category-header">
+                        <h3>Short Term Goals</h3>
+                        <p>Goals for the next few weeks or months</p>
+                        <button class="btn btn--primary add-goal-btn" data-category="short_term">
+                            <i class="fas fa-plus"></i>
+                            Add Short Term Goal
+                        </button>
+                    </div>
+                    <div class="goals-grid" id="shortTermGoalsList">
+                        <!-- Short term goals will be rendered here -->
+                    </div>
+                    <div class="empty-state" id="shortTermEmptyState">
+                        <i class="fas fa-calendar-week"></i>
+                        <h4>No short term goals yet</h4>
+                        <p>Add your first short term goal to get started!</p>
+                    </div>
+                </div>
+
+                <!-- Long Term Goals -->
+                <div class="goal-category" id="long-term-goals">
+                    <div class="category-header">
+                        <h3>Long Term Goals</h3>
+                        <p>Goals for the next year or beyond</p>
+                        <button class="btn btn--primary add-goal-btn" data-category="long_term">
+                            <i class="fas fa-plus"></i>
+                            Add Long Term Goal
+                        </button>
+                    </div>
+                    <div class="goals-grid" id="longTermGoalsList">
+                        <!-- Long term goals will be rendered here -->
+                    </div>
+                    <div class="empty-state" id="longTermEmptyState">
+                        <i class="fas fa-mountain"></i>
+                        <h4>No long term goals yet</h4>
+                        <p>Add your first long term goal to get started!</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Goal Modal -->
+    <div class="modal hidden" id="goalModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Goal</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="goalForm">
+                    <div class="form-group">
+                        <label class="form-label">Goal Title</label>
+                        <input type="text" class="form-control" id="goalTitle" placeholder="Enter goal title..." required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="goalDescription" placeholder="Describe your goal..." rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            <select class="form-control" id="goalPriority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="goalDueDate" required>
+                        </div>
+                    </div>
+                    <div class="form-group" id="progressGroup" style="display: none;">
+                        <label class="form-label">Progress (%)</label>
+                        <input type="range" class="progress-slider" id="goalProgress" min="0" max="100" value="0">
+                        <div class="progress-value">
+                            <span id="progressValue">0</span>%
+                        </div>
+                    </div>
+                    <input type="hidden" id="goalCategory" value="">
+                    <input type="hidden" id="goalId" value="">
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn--outline" id="cancelGoal">Cancel</button>
+                        <button type="submit" class="btn btn--primary" id="saveGoal">Save Goal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="goals.js"></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskMaster - Homepage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'mainapp/style.css' %}" />
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <h1 class="app-title">TaskMaster</h1>
+        </div>
+        <div class="nav-right">
+            <div class="profile-dropdown">
+                <img src="https://via.placeholder.com/40x40/007bff/fff?text={{ username|slice:":2" }}" alt="Profile" class="profile-avatar" />
+                <span class="profile-name">{{ username }}</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <button class="button" type="button">Dashboard</button>
+            <button class="button" type="button">Profile</button>
+            <button class="button" type="button">Settings</button>
+            <button class="button" type="button">Notifications</button>
+            <button class="button" type="button">Reports</button>
+            <form method="post" action="{% url 'logout' %}" style="margin-top:auto;">
+                {% csrf_token %}
+                <button type="submit" class="button is-danger">Logout</button>
+            </form>   
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <h2>Welcome back, {{ username }}</h2>
+                <p>Here's what you have planned for today.</p>
+            </section>
+
+            <!-- Task Summary Cards -->
+            <section class="task-summary">
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="summary-content">
+                        <h3>{{ total_tasks }}</h3>
+                        <p>Total Tasks</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon completed">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="summary-content">
+                        <h3>{{ completed_tasks }}</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="summary-content">
+                        <h3>{{ pending_tasks }}</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Task Input -->
+            <section class="quick-task-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Add New Task</h3>
+                        <form method="post" action="{% url 'add_task' %}">
+                            {% csrf_token %}
+                            <div class="form-group task-input-container">
+                                <input 
+                                    type="text" 
+                                    name="title"
+                                    class="form-control task-input" 
+                                    placeholder="Enter a new task..." 
+                                    required
+                                />
+                                <select 
+                                    name="priority" 
+                                    class="form-control priority-select"
+                                >
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                                <button type="submit" class="btn btn--primary">
+                                    <i class="fas fa-plus"></i> Add Task
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Task List -->
+            <section class="task-list-section">
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Your Tasks</h3>
+                    </div>
+                    <div class="card__body">
+                        {% if tasks %}
+                            <ul class="task-list">
+                                {% for task in tasks %}
+                                    <li class="task-item {% if task.completed %}completed{% endif %}">
+                                        <span class="task-title">{{ task.title }}</span>
+                                        <span class="task-meta">
+                                            Priority: {{ task.priority }} |
+                                            Created: {{ task.created_at|date:"M d, Y H:i" }}
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No tasks yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity-section">
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Recent Activity</h3>
+                    </div>
+                    <div class="card__body">
+                        {% if activities %}
+                            <ul class="activity-list">
+                                {% for activity in activities %}
+                                <li class="activity-item">
+                                    <span>{{ activity.type|title }} "{{ activity.task_title }}"</span>
+                                    <small>{{ activity.timestamp|timesince }} ago</small>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No recent activity.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
