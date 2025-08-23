@@ -69,12 +69,31 @@
             margin-bottom: 70px;
         }
         
-        /* Sortable styles */
+        .task-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #3273dc;
+        }
+        
+        .pending-section .section-title {
+            color: #3273dc;
+        }
+        
+        .completed-section .section-title {
+            color: #28a745;
+        }
+        
         .todo-list {
             list-style: none;
             margin: 0;
             padding: 0;
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
             border: 1px solid #dedede;
             border-radius: 8px;
@@ -90,7 +109,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: move;
             transition: background-color 0.2s ease;
         }
         
@@ -102,12 +120,18 @@
             border-bottom: none;
         }
         
-        .todo-list li.sortable-chosen {
-            background-color: #e3f2fd !important;
+        .pending-tasks li {
+            cursor: move;
         }
         
-        .todo-list li.sortable-ghost {
-            opacity: 0.4;
+        .completed-tasks li {
+            background-color: #f8f9fa;
+            opacity: 0.7;
+        }
+        
+        .completed-tasks .task-text {
+            text-decoration: line-through;
+            color: #6c757d;
         }
         
         .task-text {
@@ -123,14 +147,20 @@
             font-size: 1.2rem;
         }
         
-        .drag-handle:hover {
-            color: #3273dc;
-        }
-        
         .task-actions {
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+        
+        .done-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
         }
         
         .delete-btn {
@@ -141,14 +171,18 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
-            transition: background-color 0.3s ease;
         }
         
-        .delete-btn:hover {
-            background: #c82333;
+        .undo-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
         }
         
-        /* Fixed input container */
         #input-area {
             position: fixed;
             bottom: 15px;
@@ -173,12 +207,6 @@
             padding: 0.75rem 1rem;
             font-size: 1rem;
             outline: none;
-            transition: border-color 0.3s ease;
-        }
-        
-        #task-input:focus {
-            border-color: #3273dc;
-            box-shadow: 0 0 6px rgba(50, 115, 220, 0.3);
         }
         
         #add-btn {
@@ -190,26 +218,11 @@
             padding: 0 1.5rem;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
         
         #add-btn:disabled {
             background-color: #a5b8d1;
             cursor: not-allowed;
-        }
-        
-        #add-btn:hover:enabled {
-            background-color: #2759aa;
-        }
-        
-        .reorder-info {
-            background-color: #e3f2fd;
-            border: 1px solid #2196f3;
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #1565c0;
         }
     </style>
 </head>
@@ -223,7 +236,10 @@
         <div id="main-content">
             <!-- Sidebar -->
             <aside id="sidebar">
-                <button class="button" type="button">Dashboard</button>
+                <form id="dashboard" method="post" action="{% url 'home' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="button is-danger">Dashboard</button>
+                </form>
                 <button class="button is-active" type="button">My To-Do</button>
                 <button class="button" type="button">Profile</button>
                 <button class="button" type="button">Settings</button>
@@ -237,32 +253,60 @@
             <section id="content-area">
                 <h1 class="title">My To-Do List</h1>
                 
-                <div class="reorder-info">
-                    <i class="fas fa-info-circle"></i> 
-                    You can drag and drop tasks to reorder them. Your order will be automatically saved.
+                <!-- Pending Tasks Section -->
+                <div class="task-section pending-section">
+                    <h2 class="section-title">
+                        📋 Pending Tasks ({{ pending_todos|length }})
+                    </h2>
+                    
+                    <ul class="todo-list pending-tasks" id="pending-todo-list">
+                        {% for todo in pending_todos %}
+                            <li data-id="{{ todo.id }}" data-order="{{ todo.order_field }}">
+                                <div style="display: flex; align-items: center; flex-grow: 1;">
+                                    <span class="drag-handle">⋮⋮</span>
+                                    <span class="task-text">{{ todo.task }}</span>
+                                </div>
+                                <div class="task-actions">
+                                    <form method="post" action="{% url 'mark_task_done' todo.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="done-btn">✓ Done</button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li>No pending tasks. Great job! 🎉</li>
+                        {% endfor %}
+                    </ul>
                 </div>
                 
-                <ul class="todo-list" id="todo-list">
-                    {% for todo in todos %}
-                        <li data-id="{{ todo.id }}" data-order="{{ todo.order_field }}">
-                            <div style="display: flex; align-items: center; flex-grow: 1;">
-                                <span class="drag-handle">⋮⋮</span>
-                                <span class="task-text">{{ todo.task }}</span>
-                            </div>
-                            <div class="task-actions">
-                                <span style="font-size: 12px; color: #666;">Order: {{ todo.order_field }}</span>
-                                <form method="post" action="{% url 'delete_task' todo.id %}" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this task?')">
-                                        Delete
-                                    </button>
-                                </form>
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li>No tasks added yet.</li>
-                    {% endfor %}
-                </ul>
+                <!-- Completed Tasks Section -->
+                <div class="task-section completed-section">
+                    <h2 class="section-title">
+                        ✅ Completed Tasks ({{ completed_todos|length }})
+                    </h2>
+                    
+                    <ul class="todo-list completed-tasks">
+                        {% for todo in completed_todos %}
+                            <li>
+                                <div style="display: flex; align-items: center; flex-grow: 1;">
+                                    <span class="task-text">{{ todo.task }}</span>
+                                </div>
+                                <div class="task-actions">
+                                    <form method="post" action="{% url 'undo_task' todo.id %}" style="display: inline; margin-right: 5px;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="undo-btn">↶ Undo</button>
+                                    </form>
+                                    <form method="post" action="{% url 'delete_task' todo.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="delete-btn" onclick="return confirm('Permanently delete?')">🗑️ Delete</button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li>No completed tasks yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </section>
         </div>
     </div>
@@ -275,96 +319,18 @@
             id="task-input"
             name="task"
             placeholder="Add a new task..."
-            autocomplete="off"
             required
         />
         <button id="add-btn" type="submit" disabled>Add</button>
     </form>
 
     <script>
-        // Enable add button only when input is not empty
         const taskInput = document.getElementById('task-input');
         const addBtn = document.getElementById('add-btn');
 
         taskInput.addEventListener('input', () => {
             addBtn.disabled = taskInput.value.trim() === '';
         });
-
-        // Initialize SortableJS for drag and drop
-        const todoList = document.getElementById('todo-list');
-        
-        if (todoList && todoList.children.length > 0 && !todoList.querySelector('li').textContent.includes('No tasks')) {
-            const sortable = Sortable.create(todoList, {
-                animation: 150,
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                handle: '.drag-handle',
-                onEnd: function(evt) {
-                    updateTaskOrder();
-                }
-            });
-        }
-
-        function updateTaskOrder() {
-            const todoItems = document.querySelectorAll('#todo-list li[data-id]');
-            const taskOrders = [];
-            
-            todoItems.forEach((item, index) => {
-                const taskId = item.getAttribute('data-id');
-                if (taskId) {
-                    taskOrders.push({
-                        id: parseInt(taskId),
-                        order: index + 1
-                    });
-                }
-            });
-
-            // Send AJAX request to update order
-            fetch('{% url "update_task_order" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                body: JSON.stringify({ task_orders: taskOrders })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update order numbers in UI
-                    todoItems.forEach((item, index) => {
-                        const orderSpan = item.querySelector('.task-actions span');
-                        if (orderSpan) {
-                            orderSpan.textContent = `Order: ${index + 1}`;
-                        }
-                        item.setAttribute('data-order', index + 1);
-                    });
-                } else {
-                    alert('Failed to update task order: ' + (data.error || 'Unknown error'));
-                    location.reload(); // Reload page on error
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to update task order');
-                location.reload();
-            });
-        }
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
     </script>
 </body>
 </html>

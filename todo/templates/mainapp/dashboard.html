@@ -1,171 +1,516 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard with Sidebar To-Do</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    #dashboard-container {
-      display: flex;
-      height: 100vh;
-      flex-direction: column;
-    }
-
-    /* Navbar */
-    #navbar {
-      background-color: #3273dc;
-      color: white;
-      padding: 1rem 2rem;
-      font-weight: 600;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 2px 6px rgba(50, 50, 93, 0.2);
-    }
-
-    /* Main content area below navbar */
-    #main-content {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-
-    /* Sidebar with To-Do input and list */
-    #sidebar {
-      width: 280px;
-      background-color: #f5f7fa;
-      border-right: 1px solid #ddd;
-      padding: 1rem;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Feature buttons area */
-    #features {
-      margin-bottom: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-
-    #features .button {
-      justify-content: flex-start;
-      font-weight: 600;
-      color: #3273dc;
-      border: 1px solid #3273dc;
-      background: white;
-      transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-    }
-    #features .button:hover {
-      background-color: #3273dc;
-      color: white;
-      box-shadow: 0 4px 8px rgba(50, 115, 220, 0.3);
-    }
-
-    /* To-Do container in sidebar */
-    #todo-container {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      border-top: 1px solid #ddd;
-      padding-top: 1rem;
-    }
-
-    #todo-container h3 {
-      font-weight: 700;
-      font-size: 1.25rem;
-      color: #20282d;
-      margin-bottom: 0.75rem;
-    }
-
-    /* To-Do input form */
-    form#todo-form {
-      display: flex;
-      margin-bottom: 1rem;
-    }
-
-    form#todo-form input.input {
-      flex-grow: 1;
-      border-radius: 6px 0 0 6px;
-      font-size: 1rem;
-    }
-
-    form#todo-form button.button {
-      border-radius: 0 6px 6px 0;
-      font-weight: 600;
-      background-color: #3273dc;
-      color: white;
-      border: none;
-      transition: background-color 0.3s ease;
-    }
-    form#todo-form button.button:hover {
-      background-color: #2759aa;
-    }
-
-    /* To-Do list */
-    ul.todo-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      overflow-y: auto;
-      flex-grow: 1;
-      max-height: 300px;
-    }
-
-    ul.todo-list li {
-      padding: 8px 12px;
-      border-radius: 6px;
-      background-color: white;
-      margin-bottom: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      font-size: 0.95rem;
-      color: #20282d;
-      word-wrap: break-word;
-    }
-
-    #content-area {
-      flex: 1;
-      padding: 2rem;
-      overflow-y: auto;
-      background-color: white;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TaskMaster</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        #dashboard-container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        #navbar {
+            background-color: #3273dc;
+            color: white;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(50, 50, 93, 0.2);
+        }
+        
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        #main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        #sidebar {
+            width: 220px;
+            background-color: #f5f7fa;
+            border-right: 1px solid #ddd;
+            padding: 1.5rem 1rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #sidebar .button, #sidebar a.button {
+            justify-content: flex-start;
+            font-weight: 600;
+            color: #3273dc;
+            border: 1px solid #3273dc;
+            background: white;
+            width: 100%;
+            margin-bottom: 0.8rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        #sidebar .button:hover, #sidebar .button.is-active, 
+        #sidebar a.button:hover, #sidebar a.button.is-active {
+            background-color: #3273dc;
+            color: white;
+            box-shadow: 0 4px 8px rgba(50, 115, 220, 0.3);
+        }
+        
+        form#logout-form {
+            margin-top: auto;
+        }
+        
+        #content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid;
+            transition: transform 0.2s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .dashboard-card.total {
+            border-left-color: #3273dc;
+        }
+        
+        .dashboard-card.completed {
+            border-left-color: #28a745;
+        }
+        
+        .dashboard-card.pending {
+            border-left-color: #ffc107;
+        }
+        
+        .dashboard-card.today {
+            border-left-color: #17a2b8;
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .recent-tasks {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .task-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-text {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        
+        .task-meta {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .no-tasks {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 2rem;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .action-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #3273dc;
+            color: #3273dc;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: #3273dc;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .welcome-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="dashboard-container">
-    <div id="navbar">
-      Welcome, <strong>{{ username }}</strong>
-    </div>
-    <div id="main-content">
-      <aside id="sidebar" aria-label="Sidebar with features and to-do list">
-        <div id="features">
-          <button class="button" type="button">Dashboard</button>
-          <button class="button" type="button">Profile</button>
-          <button class="button" type="button">Settings</button>
-          <button class="button" type="button">Notifications</button>
-          <button class="button" type="button">Reports</button>
-          <a href="{% url 'todolist' %}" class="button">
-            My To-Do
-            </a>
-          <form method="post" action="{% url 'logout' %}" style="margin-top:auto;">
-            {% csrf_token %}
-            <button type="submit" class="button is-danger">Logout</button>
-          </form>
+    <div id="dashboard-container">
+        <!-- Top Navbar -->
+        <div id="navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-tasks"></i>
+                <strong>TaskMaster</strong>
+            </div>
+            <div>
+                Welcome, <strong>{{ username }}</strong>
+            </div>
         </div>
-      </aside>
+        
+        <div id="main-content">
+            <!-- Sidebar -->
+            <aside id="sidebar">
+                <a href="{% url 'home' %}" class="button is-active">
+                    <i class="fas fa-home"></i>&nbsp;&nbsp;Dashboard
+                </a>
+                <a href="{% url 'todolist' %}" class="button">
+                    <i class="fas fa-list"></i>&nbsp;&nbsp;My To-Do
+                </a>
+                <button class="button" type="button">
+                    <i class="fas fa-calendar"></i>&nbsp;&nbsp;Calendar
+                </button>
+                <button class="button" type="button">
+                    <i class="fas fa-user"></i>&nbsp;&nbsp;Profile
+                </button>
+                <button class="button" type="button">
+                    <i class="fas fa-cog"></i>&nbsp;&nbsp;Settings
+                </button>
+                <form id="logout-form" method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="button is-danger">
+                        <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Logout
+                    </button>
+                </form>
+            </aside>
 
-      <section id="content-area">
-        <h1 class="title">Dashboard Content</h1>
-        <p>Your main dashboard content goes here.</p>
-      </section>
+            <!-- Main Content -->
+            <section id="content-area">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <h1 class="welcome-title">Good {% now "A" %}, {{ username }}!</h1>
+                    <p class="welcome-subtitle">Here's your task overview and productivity dashboard</p>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="{% url 'todolist' %}" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        Add New Task
+                    </a>
+                    <a href="{% url 'todolist' %}" class="action-btn">
+                        <i class="fas fa-list-check"></i>
+                        View All Tasks
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-calendar-plus"></i>
+                        Schedule Task
+                    </a>
+                </div>
+                
+                <!-- Statistics Grid -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card total">
+                        <div class="card-icon">
+                            <i class="fas fa-tasks" style="color: #3273dc;"></i>
+                        </div>
+                        <div class="card-number">{{ total_tasks }}</div>
+                        <div class="card-label">Total Tasks</div>
+                    </div>
+                    
+                    <div class="dashboard-card completed">
+                        <div class="card-icon">
+                            <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                        </div>
+                        <div class="card-number">{{ completed_tasks }}</div>
+                        <div class="card-label">Completed</div>
+                    </div>
+                    
+                    <div class="dashboard-card pending">
+                        <div class="card-icon">
+                            <i class="fas fa-clock" style="color: #ffc107;"></i>
+                        </div>
+                        <div class="card-number">{{ pending_tasks }}</div>
+                        <div class="card-label">Pending</div>
+                    </div>
+                    
+                    <div class="dashboard-card today">
+                        <div class="card-icon">
+                            <i class="fas fa-calendar-day" style="color: #17a2b8;"></i>
+                        </div>
+                        <div class="card-number">{{ today_tasks }}</div>
+                        <div class="card-label">Created Today</div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Layout -->
+                <div class="dashboard-layout">
+                    <!-- Pie Chart -->
+                    <div class="chart-container">
+                        <h2 class="chart-title">
+                            <i class="fas fa-chart-pie"></i>&nbsp;&nbsp;Task Progress Overview
+                        </h2>
+                        <div class="chart-wrapper">
+                            <canvas id="taskPieChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Tasks -->
+                    <div class="recent-tasks">
+                        <h2 class="section-title">
+                            <i class="fas fa-history"></i>
+                            Recent Tasks
+                        </h2>
+                        
+                        {% if recent_tasks %}
+                            {% for task in recent_tasks %}
+                                <div class="task-item">
+                                    <div class="task-text">
+                                        <strong>{{ task.task|truncatechars:30 }}</strong>
+                                        <div class="task-meta">
+                                            {% if task.completed %}
+                                                <i class="fas fa-check-circle" style="color: #28a745;"></i> Completed
+                                            {% else %}
+                                                <i class="fas fa-clock" style="color: #ffc107;"></i> Pending
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <div style="text-align: center; margin-top: 1rem;">
+                                <a href="{% url 'todolist' %}" class="button is-small is-primary">
+                                    View All Tasks
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="no-tasks">
+                                <i class="fas fa-inbox" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                                <p>No tasks yet. Create your first task!</p>
+                                <a href="{% url 'todolist' %}" class="button is-primary">
+                                    <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Task
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        </div>
     </div>
-  </div>
+
+    <script>
+        // Pie Chart for Task Progress
+    const ctx = document.getElementById('taskPieChart').getContext('2d');
+    
+    // Get data from Django template safely
+    const taskData = {
+        completed: parseInt('{{ completed_tasks|default:0 }}') || 0,
+        pending: parseInt('{{ pending_tasks|default:0 }}') || 0
+    };
+    
+    const completedTasks = taskData.completed;
+    const pendingTasks = taskData.pending;
+    
+    console.log('Completed tasks:', completedTasks);
+    console.log('Pending tasks:', pendingTasks);
+        
+        // Only create chart if there are tasks
+        if (completedTasks > 0 || pendingTasks > 0) {
+            const taskPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Completed Tasks', 'Pending Tasks'],
+                    datasets: [{
+                        data: [completedTasks, pendingTasks],
+                        backgroundColor: [
+                            '#28a745',  // Green for completed
+                            '#ffc107'   // Yellow for pending
+                        ],
+                        borderColor: [
+                            '#1e7e34',  // Darker green
+                            '#d39e00'   // Darker yellow
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.raw / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.raw + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        } else {
+            // Show message when no tasks
+            document.querySelector('.chart-wrapper').innerHTML = `
+                <div style="text-align: center; color: #999;">
+                    <i class="fas fa-chart-pie" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <h3>No Tasks Yet</h3>
+                    <p>Create your first task to see the progress chart!</p>
+                    <a href="{% url 'todolist' %}" class="button is-primary">
+                        <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Task
+                    </a>
+                </div>
+            `;
+        }
+    </script>
 </body>
 </html>
