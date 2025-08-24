@@ -1,0 +1,575 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar - TaskMaster</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js'></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        #dashboard-container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        #navbar {
+            background-color: #3273dc;
+            color: white;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(50, 50, 93, 0.2);
+        }
+        
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        #main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        #sidebar {
+            width: 220px;
+            background-color: #f5f7fa;
+            border-right: 1px solid #ddd;
+            padding: 1.5rem 1rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #sidebar .button, #sidebar a.button {
+            justify-content: flex-start;
+            font-weight: 600;
+            color: #3273dc;
+            border: 1px solid #3273dc;
+            background: white;
+            width: 100%;
+            margin-bottom: 0.8rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        #sidebar .button:hover, #sidebar .button.is-active, 
+        #sidebar a.button:hover, #sidebar a.button.is-active {
+            background-color: #3273dc;
+            color: white;
+            box-shadow: 0 4px 8px rgba(50, 115, 220, 0.3);
+        }
+        
+        form#logout-form {
+            margin-top: auto;
+        }
+        
+        #content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: white;
+        }
+        
+        /* Calendar specific styles */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3273dc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        #calendar {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: calc(100vh - 250px);
+        }
+        
+        /* FullCalendar custom styles */
+        .fc-event {
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .fc-daygrid-event {
+            font-size: 12px;
+            padding: 2px 4px;
+        }
+        
+        .fc-event-title {
+            font-weight: 600;
+        }
+        
+        /* Modal styles */
+        .modal-card {
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .form-field {
+            margin-bottom: 1rem;
+        }
+        
+        .form-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .form-field input, .form-field textarea, .form-field select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-field textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .checkbox-field {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .checkbox-field input[type="checkbox"] {
+            width: auto;
+        }
+        
+        /* Priority colors */
+        .priority-high { border-left: 4px solid #dc3545; }
+        .priority-medium { border-left: 4px solid #ffc107; }
+        .priority-low { border-left: 4px solid #28a745; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calendar-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard-container">
+        <!-- Top Navbar -->
+        <div id="navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-tasks"></i>
+                <strong>TaskMaster</strong>
+            </div>
+            <div>
+                Welcome, <strong>{{ username }}</strong>
+            </div>
+        </div>
+        
+        <div id="main-content">
+            <!-- Sidebar -->
+            <aside id="sidebar">
+                <a href="{% url 'home' %}" class="button">
+                    <i class="fas fa-home"></i>&nbsp;&nbsp;Dashboard
+                </a>
+                <a href="{% url 'todolist' %}" class="button">
+                    <i class="fas fa-list"></i>&nbsp;&nbsp;My To-Do
+                </a>
+                <a href="{% url 'calendar' %}" class="button is-active">
+                    <i class="fas fa-calendar"></i>&nbsp;&nbsp;Calendar
+                </a>
+                <a href="{% url 'profile' %}" class="button">
+                    <i class="fas fa-user"></i>&nbsp;&nbsp;Profile
+                </a>
+                <button class="button" type="button">
+                    <i class="fas fa-cog"></i>&nbsp;&nbsp;Settings
+                </button>
+                <form id="logout-form" method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="button is-danger">
+                        <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Logout
+                    </button>
+                </form>
+            </aside>
+
+            <!-- Calendar Content -->
+            <section id="content-area">
+                <div class="calendar-header">
+                    <h1 class="calendar-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        My Calendar
+                    </h1>
+                    <button class="button is-primary" onclick="openAddEventModal()">
+                        <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Event
+                    </button>
+                </div>
+                
+                <div id='calendar'></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Add/Edit Event Modal -->
+    <div class="modal" id="eventModal">
+        <div class="modal-background" onclick="closeEventModal()"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title" id="modalTitle">Add New Event</p>
+                <button class="delete" onclick="closeEventModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <form id="eventForm">
+                    <div class="form-field">
+                        <label for="eventTitle">Event Title *</label>
+                        <input type="text" id="eventTitle" placeholder="Enter event title" required>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="eventDescription">Description</label>
+                        <textarea id="eventDescription" placeholder="Enter event description (optional)"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="startDate">Start Date *</label>
+                            <input type="date" id="startDate" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="endDate">End Date</label>
+                            <input type="date" id="endDate">
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-field">
+                        <input type="checkbox" id="allDay">
+                        <label for="allDay">All Day Event</label>
+                    </div>
+                    
+                    <div class="form-row" id="timeFields">
+                        <div class="form-field">
+                            <label for="startTime">Start Time</label>
+                            <input type="time" id="startTime">
+                        </div>
+                        <div class="form-field">
+                            <label for="endTime">End Time</label>
+                            <input type="time" id="endTime">
+                        </div>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="priority">Priority</label>
+                        <select id="priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-primary" id="saveButton" onclick="saveEvent()">Save Event</button>
+                <button class="button" onclick="closeEventModal()">Cancel</button>
+                <button class="button is-danger" id="deleteButton" onclick="deleteEvent()" style="display: none;">
+                    Delete Event
+                </button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        let calendar;
+        let currentEvent = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                events: '/calendar/events/',
+                editable: true,
+                selectable: true,
+                selectMirror: true,
+                dayMaxEvents: true,
+                weekends: true,
+                height: 'auto',
+                
+                select: function(arg) {
+                    openAddEventModal(arg.startStr);
+                    calendar.unselect();
+                },
+                
+                eventClick: function(arg) {
+                    editEvent(arg.event);
+                },
+                
+                eventDrop: function(arg) {
+                    updateEventDate(arg.event);
+                },
+                
+                eventResize: function(arg) {
+                    updateEventDate(arg.event);
+                }
+            });
+            
+            calendar.render();
+            
+            // Handle all day checkbox
+            document.getElementById('allDay').addEventListener('change', function() {
+                const timeFields = document.getElementById('timeFields');
+                timeFields.style.display = this.checked ? 'none' : 'grid';
+            });
+        });
+        
+        function openAddEventModal(selectedDate = null) {
+            currentEvent = null;
+            document.getElementById('modalTitle').textContent = 'Add New Event';
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventDescription').value = '';
+            document.getElementById('startDate').value = selectedDate || new Date().toISOString().split('T')[0];
+            document.getElementById('endDate').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('priority').value = 'medium';
+            document.getElementById('allDay').checked = false;
+            document.getElementById('timeFields').style.display = 'grid';
+            document.getElementById('deleteButton').style.display = 'none';
+            document.getElementById('saveButton').textContent = 'Add Event';
+            document.getElementById('eventModal').classList.add('is-active');
+        }
+        
+        function editEvent(event) {
+            currentEvent = event;
+            document.getElementById('modalTitle').textContent = 'Edit Event';
+            document.getElementById('eventTitle').value = event.title;
+            document.getElementById('eventDescription').value = event.extendedProps.description || '';
+            
+            // Handle dates
+            const startDate = new Date(event.start);
+            document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+            
+            if (event.end) {
+                const endDate = new Date(event.end);
+                document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+            }
+            
+            // Handle times
+            if (event.allDay) {
+                document.getElementById('allDay').checked = true;
+                document.getElementById('timeFields').style.display = 'none';
+            } else {
+                document.getElementById('allDay').checked = false;
+                document.getElementById('timeFields').style.display = 'grid';
+                
+                const startTime = startDate.toTimeString().slice(0, 5);
+                document.getElementById('startTime').value = startTime;
+                
+                if (event.end) {
+                    const endTime = new Date(event.end).toTimeString().slice(0, 5);
+                    document.getElementById('endTime').value = endTime;
+                }
+            }
+            
+            document.getElementById('priority').value = event.extendedProps.priority || 'medium';
+            document.getElementById('deleteButton').style.display = 'inline-block';
+            document.getElementById('saveButton').textContent = 'Update Event';
+            document.getElementById('eventModal').classList.add('is-active');
+        }
+        
+        function closeEventModal() {
+            document.getElementById('eventModal').classList.remove('is-active');
+            currentEvent = null;
+        }
+        
+        function saveEvent() {
+            const title = document.getElementById('eventTitle').value.trim();
+            const description = document.getElementById('eventDescription').value.trim();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const priority = document.getElementById('priority').value;
+            const allDay = document.getElementById('allDay').checked;
+            
+            if (!title || !startDate) {
+                alert('Please fill in the required fields (Title and Start Date)');
+                return;
+            }
+            
+            const eventData = {
+                title: title,
+                description: description,
+                start_date: startDate,
+                end_date: endDate || startDate,
+                start_time: allDay ? null : startTime,
+                end_time: allDay ? null : endTime,
+                priority: priority,
+                all_day: allDay
+            };
+            
+            const url = currentEvent ? 
+                `/calendar/update-event/${currentEvent.id}/` : 
+                '/calendar/add-event/';
+                
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(eventData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    calendar.refetchEvents();
+                    closeEventModal();
+                    showNotification(data.message, 'success');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to save event');
+            });
+        }
+        
+        function deleteEvent() {
+            if (!currentEvent) return;
+            
+            if (confirm('Are you sure you want to delete this event?')) {
+                fetch(`/calendar/delete-event/${currentEvent.id}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        calendar.refetchEvents();
+                        closeEventModal();
+                        showNotification(data.message, 'success');
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to delete event');
+                });
+            }
+        }
+        
+        function updateEventDate(event) {
+            const eventData = {
+                start_date: event.startStr.split('T')[0],
+                end_date: event.endStr ? event.endStr.split('T')[0] : event.startStr.split('T')[0]
+            };
+            
+            fetch(`/calendar/update-event/${event.id}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(eventData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('Error updating event: ' + data.error);
+                    calendar.refetchEvents();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                calendar.refetchEvents();
+            });
+        }
+        
+        function showNotification(message, type) {
+            // Simple notification system
+            const notification = document.createElement('div');
+            notification.className = `notification is-${type}`;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

@@ -253,15 +253,15 @@
                 <a href="{% url 'home' %}" class="button">
                     <i class="fas fa-home"></i>&nbsp;&nbsp;Dashboard
                 </a>
-                <a href="{% url 'todolist' %}" class="button">
+                <a href="{% url 'todolist' %}" class="button is-active">
                     <i class="fas fa-list"></i>&nbsp;&nbsp;My To-Do
                 </a>
-                <button class="button" type="button">
+                <a href="{% url 'calendar' %}" class="button">
                     <i class="fas fa-calendar"></i>&nbsp;&nbsp;Calendar
-                </button>
-                <button class="button" type="button">
+                </a>
+                <a href="{% url 'profile' %}" class="button">
                     <i class="fas fa-user"></i>&nbsp;&nbsp;Profile
-                </button>
+                </a>
                 <button class="button" type="button">
                     <i class="fas fa-cog"></i>&nbsp;&nbsp;Settings
                 </button>
