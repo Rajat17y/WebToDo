@@ -5,8 +5,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard - To-Do</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         html, body {
             height: 100%;
@@ -27,7 +28,14 @@
             font-size: 1.2rem;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             box-shadow: 0 2px 6px rgba(50, 50, 93, 0.2);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         #main-content {
             flex: 1;
@@ -230,22 +238,38 @@
     <div id="dashboard-container">
         <!-- Top Navbar -->
         <div id="navbar">
-            Welcome, <strong>{{ username }}</strong>
+            <div class="navbar-brand">
+                <i class="fas fa-tasks"></i>
+                <strong>TaskMaster</strong>
+            </div>
+            <div>
+                Welcome, <strong>{{ username }}</strong>
+            </div>
         </div>
         
         <div id="main-content">
             <!-- Sidebar -->
             <aside id="sidebar">
-                <form id="dashboard" method="post" action="{% url 'home' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="button is-danger">Dashboard</button>
-                </form>
-                <button class="button is-active" type="button">My To-Do</button>
-                <button class="button" type="button">Profile</button>
-                <button class="button" type="button">Settings</button>
+                <a href="{% url 'home' %}" class="button">
+                    <i class="fas fa-home"></i>&nbsp;&nbsp;Dashboard
+                </a>
+                <a href="{% url 'todolist' %}" class="button">
+                    <i class="fas fa-list"></i>&nbsp;&nbsp;My To-Do
+                </a>
+                <button class="button" type="button">
+                    <i class="fas fa-calendar"></i>&nbsp;&nbsp;Calendar
+                </button>
+                <button class="button" type="button">
+                    <i class="fas fa-user"></i>&nbsp;&nbsp;Profile
+                </button>
+                <button class="button" type="button">
+                    <i class="fas fa-cog"></i>&nbsp;&nbsp;Settings
+                </button>
                 <form id="logout-form" method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit" class="button is-danger">Logout</button>
+                    <button type="submit" class="button is-danger">
+                        <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Logout
+                    </button>
                 </form>
             </aside>
 

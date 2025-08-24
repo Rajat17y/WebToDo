@@ -296,7 +296,7 @@
         <div id="main-content">
             <!-- Sidebar -->
             <aside id="sidebar">
-                <a href="{% url 'home' %}" class="button is-active">
+                <a href="{% url 'home' %}" class="button">
                     <i class="fas fa-home"></i>&nbsp;&nbsp;Dashboard
                 </a>
                 <a href="{% url 'todolist' %}" class="button">
@@ -323,10 +323,36 @@
             <section id="content-area">
                 <!-- Welcome Section -->
                 <div class="welcome-section">
-                    <h1 class="welcome-title">Good {% now "A" %}, {{ username }}!</h1>
+                    <h1 class="welcome-title" id="greeting">Good Day, {{ username }}!</h1>
                     <p class="welcome-subtitle">Here's your task overview and productivity dashboard</p>
                 </div>
-                
+
+                <script>
+                    // Function to get appropriate greeting based on time
+                    function getGreeting() {
+                        const now = new Date();
+                        const hour = now.getHours();
+                        
+                        if (hour >= 5 && hour < 12) {
+                            return "Good Morning";
+                        } else if (hour >= 12 && hour < 17) {
+                            return "Good Afternoon";
+                        } else if (hour >= 17 && hour < 21) {
+                            return "Good Evening";
+                        } else {
+                            return "Good Night";
+                        }
+                    }
+                    
+                    // Update greeting on page load
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const greetingElement = document.getElementById('greeting');
+                        const greeting = getGreeting();
+                        const username = "{{ username }}";
+                        greetingElement.textContent = `${greeting}, ${username}!`;
+                    });
+                </script>
+                                
                 <!-- Quick Actions -->
                 <div class="quick-actions">
                     <a href="{% url 'todolist' %}" class="action-btn">
