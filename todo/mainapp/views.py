@@ -12,6 +12,8 @@ import json
 from datetime import datetime, date
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.db import models
 
 def landing_page(request):
     return render(request, 'mainapp/landing.html')
@@ -298,7 +300,7 @@ def delete_calendar_event(request, event_id):
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
-# Existing Task Views remain the same...
+# Task Views
 @login_required
 def delete_task(request, pk):
     if request.method == "POST":
@@ -345,7 +347,16 @@ def todo_page_view(request):
     if request.method == 'POST':
         task_text = request.POST.get('task', '').strip()
         if task_text:
-            Tasks.objects.create(user=user, task=task_text)
+            # Get the maximum order value for pending tasks
+            max_order = Tasks.objects.filter(user=user, completed=False).aggregate(
+                models.Max('order_field'))['order_field__max']
+            
+            # Create the new task with the next order value
+            Tasks.objects.create(
+                user=user, 
+                task=task_text, 
+                order_field=(max_order or 0) + 1
+            )
         return redirect('todolist')
 
     context = {
@@ -356,20 +367,20 @@ def todo_page_view(request):
     return render(request, 'mainapp/todolist.html', context)
 
 @login_required
+@csrf_exempt
 def update_task_order(request):
-    """Handle AJAX request to update task order"""
+    """Handle AJAX request to update task order after drag and drop"""
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            task_orders = data.get('task_orders', [])
-
-            for item in task_orders:
-                task_id = item['id']
-                new_order = item['order']
-                task = Tasks.objects.get(id=task_id, user=request.user, completed=False)
-                task.order_field = new_order
+            task_order = data.get('task_order', [])
+            
+            # Update the order of each task
+            for index, task_id in enumerate(task_order):
+                task = Tasks.objects.get(id=task_id, user=request.user)
+                task.order_field = index + 1  # Start from 1 instead of 0
                 task.save()
-
+                
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
